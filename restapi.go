@@ -1858,6 +1858,30 @@ func (s *Session) ChannelMessageSendEmbedsReply(channelID string, embeds []*Mess
 	}, options...)
 }
 
+// ChannelMessageClickButton sends a button click interaction on a message.
+// message   : The Message that contains the button to click.
+// button    : The Button to click.
+func (s *Session) ChannelMessageClickButton(message *Message, button *Button, options ...RequestOption) error {
+	endpoint := EndpointInteractions()
+
+	data := MessageComponentInteraction{
+		AppID:     message.Author.ID,
+		ChannelID: message.ChannelID,
+		Data: MessageComponentInteractionData{
+			CustomID:      button.CustomID,
+			ComponentType: ButtonComponent,
+		},
+		GuildID:      message.GuildID,
+		MessageFlags: message.Flags,
+		MessageID:    message.ID,
+		SessionID:    s.sessionID,
+		Type:         InteractionMessageComponent,
+	}
+
+	_, err := s.RequestWithBucketID("POST", endpoint, data, endpoint, options...)
+	return err
+}
+
 // ChannelMessageEdit edits an existing message, replacing it entirely with
 // the given content.
 // channelID  : The ID of a Channel
